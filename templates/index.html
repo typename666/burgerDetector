@@ -67,12 +67,6 @@
         $file.style.display = 'none';
         $result.style.display = 'block';
         $resultLoading.style.display = 'block';
-        await delay(500);
-        //const res = await fetch(SERVER_PATH, { method: 'POST', body: formData });
-        //const blob = await res.blob();
-        //const time = res.headers.get('Work-Time');
-        //const resultSrc = URL.createObjectURL(blob);
-        // const resultSrc = '';
 		
 		const res = await fetch(SERVER_PATH, { method: 'POST', body: formData });
         const { img, time } = await res.json();
