@@ -29,15 +29,6 @@
   </main>
 
   <script>
-    function delay(ms, rejected = false) {
-      return new Promise((resolve, reject) => {
-        window.setTimeout(() => {
-          if(rejected) reject('Error...');
-          resolve();
-        }, ms);
-      });
-    }
-
     const SERVER_PATH = 'http://localhost:5000/api';
 
     const $file = document.querySelector('input[type="file"]');
