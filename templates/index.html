@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>html{font-size:20px}*{font-family:sans-serif;box-sizing:border-box}h1{font-size:40px;margin:15px 0}h2{font-size:35px;margin:15px 0}h3{font-size:30px;margin:10px 0}h4{font-size:25px;margin:10px 0}h5{font-size:20px;margin:5px 0}h6{font-size:15px;margin:5px 0}p{margin:10px 0;line-height:1.5}blockquote{border-left:5px solid #aaa;padding-left:20px;margin:10px 40px}blockquote p{margin-bottom:0}blockquote cite{color:#aaa;font-style:italic;font-weight:bold;font-size:15px;display:block}hr{border:1px solid #aaa}details{background:#aeb7c21f;padding:10px;line-height:1.5}details summary{color:#2a5885;font-weight:bold;padding-left:5px;cursor:pointer}details summary>*{display:inline}code,pre{border-radius:5px;font-family:monospace;font-weight:bold;color:#e75480;padding:0 5px;background:#aeb7c21f;overflow:auto;max-width:100%}pre{padding:5px;margin:5px 0}pre code{background:transparent;font-weight:normal;font-size:15px}ul,ol{margin:10px 0;padding-left:20px}ul li,ol li{line-height:1.5}ul ul,ul ol,ol ul,ol ol{margin:0}dl{display:inline-block;margin:0}dl dt{font-weight:bold;line-height:1.5;margin:0;padding-top:10px}dl dd{line-height:1.5;margin-left:20px;padding-bottom:10px}dl dd+dt{border-top:1px solid #aaa}a,a:link{color:#2a5885;text-decoration:none}a:visited{color:#2a5885}a:hover{text-decoration:underline;cursor:pointer;opacity:.8}a:active{opacity:.6}img{display:block;margin:0 auto;max-width:90%}figure{background-color:#aeb7c21f;padding:20px;padding-bottom:15px;margin:0}figure figcaption{color:#aaa;text-align:center;font-size:15px;margin-top:15px}table{border-collapse:collapse}table caption{padding-bottom:5px;font-style:italic}table caption+thead{border-top:2px solid #000}table thead{border-bottom:2px solid #000}table thead td,table thead th{border:none}table tbody tr{border-bottom:1px solid #aaa}table tbody tr:hover{background-color:#aeb7c21f}table th,table td{padding:5px;text-align:center}button,input[type=reset],input[type=button]{border:none;outline:none;border-radius:10px;background-color:#768eff;color:#fff;font-weight:bold;font-size:20px;padding:10px 15px}button:hover,input[type=reset]:hover,input[type=button]:hover{cursor:pointer;opacity:.8}button:focus,input[type=reset]:focus,input[type=button]:focus{box-shadow:0 0 0 3px #2a5885}button:active,input[type=reset]:active,input[type=button]:active{opacity:.6}input:not([type=checkbox],[type=radio],[type=reset],[type=submit],[type=button]),textarea,select{font-family:inherit;font-size:100%;display:block;box-sizing:border-box;border-radius:5px;border:1px solid #aaa;outline:none;background:transparent;margin:0;padding:10px;width:100%}input:not([type=checkbox],[type=radio],[type=reset],[type=submit],[type=button]):focus,textarea:focus,select:focus{box-shadow:0 0 0 3px #768eff;border:1px solid #000}label+input:not([type=checkbox],[type=radio]),label+textarea,label+select{margin:5px}fieldset{border:none;padding:0;margin:10px 0}fieldset legend{font-weight:bold;font-size:125%;padding:0;margin-bottom:5px} main{width: 80vw; margin:0 auto}</style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Burger predictor</h1>
+    </header>
+
+    <div id="select">
+      <input type="file" accept="image/*">
+    </div>
+
+    <div id="result">
+      <img src="" alt="Result...">
+      <p class="loading">Loading...</p>
+      <p class="error">Error :(</p>
+      <p class="time"></p>
+    </div>
+    
+    <br>
+    <button>Load new</button>
+  </main>
+
+  <script>
+    function delay(ms, rejected = false) {
+      return new Promise((resolve, reject) => {
+        window.setTimeout(() => {
+          if(rejected) reject('Error...');
+          resolve();
+        }, ms);
+      });
+    }
+
+    const SERVER_PATH = 'http://localhost:5000/api';
+
+    const $file = document.querySelector('input[type="file"]');
+
+    const $result = document.querySelector('#result');
+    const $resultImg = document.querySelector('#result img');
+    const $resultLoading = document.querySelector('#result .loading');
+    const $resultError = document.querySelector('#result .error');
+    const $resultTime = document.querySelector('#result .time');
+    
+    const $btn = document.querySelector('button');
+
+    $result.style.display = 'none';
+    $resultImg.style.display = 'none';
+    $resultLoading.style.display = 'none';
+    $resultError.style.display = 'none';
+    $resultTime.style.display = 'none';
+    $btn.style.display = 'none';
+
+    async function changeHandler(e) {
+      e.preventDefault();
+      const file = e.target.files[0];
+      
+      try {
+        const formData = new FormData();
+        formData.append('img', file);
+        $file.style.display = 'none';
+        $result.style.display = 'block';
+        $resultLoading.style.display = 'block';
+        await delay(500);
+        //const res = await fetch(SERVER_PATH, { method: 'POST', body: formData });
+        //const blob = await res.blob();
+        //const time = res.headers.get('Work-Time');
+        //const resultSrc = URL.createObjectURL(blob);
+        // const resultSrc = '';
+		
+		const res = await fetch(SERVER_PATH, { method: 'POST', body: formData });
+        const { img, time } = await res.json();
+        const resultSrc = `data:image/jpg;base64,${img}`;
+		
+        $resultLoading.style.display = 'none';
+        $resultImg.style.display = 'block';
+        $resultImg.src = resultSrc;
+        $btn.style.display = 'block';
+        $resultTime.style.display = 'block';
+        $resultTime.innerText = `Время выполнения: ${time}`;
+      } catch(e) {
+        $resultLoading.style.display = 'none';
+        $resultError.style.display = 'block';
+        $resultError.innerHTML = e;
+        console.log('Error:\n\n', e);
+      }
+    }
+    $file.addEventListener('change', changeHandler);
+
+    function loadNewHandler() {
+      // $uploaded.style.display = 'none';
+      $result.style.display = 'none';
+      $resultImg.style.display = 'none';
+      $resultLoading.style.display = 'none';
+      $resultError.style.display = 'none';
+      $btn.style.display = 'none';
+      $file.style.display = 'block';
+      $file.click();
+    }
+    $btn.addEventListener('click', loadNewHandler);
+  </script>
+</body>
+</html>
